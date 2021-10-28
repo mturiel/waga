@@ -1,16 +1,18 @@
 package de.wagawin.recruitment.service;
 
 import de.wagawin.recruitment.dto.ParentMealDTO;
-import de.wagawin.recruitment.model.Child;
-import de.wagawin.recruitment.model.Meal;
-import de.wagawin.recruitment.model.Person;
+import de.wagawin.recruitment.exceptions.NotFoundException;
+import de.wagawin.recruitment.model.*;
 import de.wagawin.recruitment.service.repository.ChildRepository;
 import de.wagawin.recruitment.service.repository.HouseRepository;
 import de.wagawin.recruitment.service.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,11 +54,41 @@ public class PersonService {
 
     public ParentMealDTO findPersonByChild(Child child) {
         Child attached = childRepository.findFirstByNameAndAge(child.getName(), child.getAge());
+        if (attached == null) {
+            throw new NotFoundException();
+        }
         Optional<Meal> favoriteMeal = attached.getMealList().stream().findFirst();
         return new ParentMealDTO(attached.getPerson(), favoriteMeal.get());
     }
 
     public void deleteAll() {
         personRepository.deleteAll();
+    }
+
+    public Child createChild(Child child, Integer personId) {
+        Optional<Person> person = personRepository.findById(personId);
+        if (person.isPresent()) {
+            child.setPerson(person.get());
+            return childRepository.save(child);
+        } else {
+            throw new NotFoundException();
+        }
+    }
+
+    public ResponseEntity<Map<String, String>> findChild(Child child) {
+        Child attached = childRepository.findFirstByNameAndAge(child.getName(), child.getAge());
+        if (attached == null) {
+            throw new NotFoundException();
+        }
+        String key, value;
+        if (attached instanceof Son) {
+            key = "bicycleColor";
+            value = ((Son) attached).getBicycleColor();
+        } else {
+            key = "hairColor";
+            value = ((Daughter) attached).getHairColor();
+        }
+
+        return ResponseEntity.ok(Collections.singletonMap(key, value));
     }
 }
