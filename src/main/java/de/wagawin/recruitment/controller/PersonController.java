@@ -14,7 +14,7 @@ public class PersonController {
     @Autowired
     private PersonService personService;
 
-    @PostMapping()
+    @PostMapping
     public Person createPerson(@RequestBody Person person) {
         return personService.createPerson(person);
     }
@@ -25,13 +25,13 @@ public class PersonController {
         personService.deletePerson(personId);
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAll() {
         personService.deleteAll();
     }
 
-    @GetMapping()
+    @GetMapping
     public List<Person> listAll() {
         return personService.getAll();
     }

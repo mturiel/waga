@@ -15,7 +15,7 @@ public class HouseController {
     @Autowired
     private PersonService personService;
 
-    @GetMapping()
+    @GetMapping
     public House getHouseByPerson(@RequestBody Person person) {
         return personService.findPerson(person).getHouse();
     }
