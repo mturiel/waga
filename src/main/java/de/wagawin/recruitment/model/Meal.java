@@ -5,22 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Getter @Setter
 @Entity
-public class Meal {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
+public class Meal extends BaseEntity {
     private String name;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Child child;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date invented;
-
+    private Integer vote;
 }

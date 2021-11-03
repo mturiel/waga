@@ -8,11 +8,7 @@ import javax.persistence.*;
 
 @Getter @Setter
 @Entity
-public class House {
-    @Id
-    @Column(name = "person_id")
-    private Integer id;
-
+public class House extends BaseEntity {
     private String address;
 
     private String zipCode;
@@ -22,7 +18,7 @@ public class House {
     @JsonIgnore
     @OneToOne
     @MapsId
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "id")
     private Person person;
 
 }

@@ -15,6 +15,11 @@ public class HouseController {
     @Autowired
     private PersonService personService;
 
+    /**
+     * This endpoint returns the House for a given person
+     * @param person given person in json format. ID field is optional.
+     * @return house json object
+     */
     @GetMapping
     public House getHouseByPerson(@RequestBody Person person) {
         return personService.findPerson(person).getHouse();

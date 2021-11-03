@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 @Entity
-public class Son extends Child {
-    private String bicycleColor;
+public class ParentSummary extends BaseEntity {
+    private Long amountOfPersons;
+
+    private Long amountOfChildren;
 }

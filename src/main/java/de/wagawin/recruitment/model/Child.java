@@ -10,11 +10,8 @@ import java.util.Set;
 
 @Getter @Setter
 @Entity
-public class Child {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public class Child extends BaseEntity {
     private String name;
 
     private Integer age;
@@ -23,7 +20,7 @@ public class Child {
     private Set<Meal> mealList = new HashSet<>();
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Person person;
 
     public void addMeal(Meal meal) {

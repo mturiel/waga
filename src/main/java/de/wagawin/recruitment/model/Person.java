@@ -9,12 +9,7 @@ import java.util.Set;
 
 @Getter @Setter
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(name = "UniqueNameAndAge", columnNames = { "name", "age" }) })
-public class Person {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
+public class Person extends BaseEntity {
     private String name;
 
     private Integer age;

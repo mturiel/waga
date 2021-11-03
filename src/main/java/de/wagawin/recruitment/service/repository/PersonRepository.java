@@ -1,11 +1,19 @@
 package de.wagawin.recruitment.service.repository;
 
-import de.wagawin.recruitment.model.House;
 import de.wagawin.recruitment.model.Person;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
-public interface PersonRepository extends JpaRepository<Person, Integer> {
-    Person findFirstByNameAndAge(String name, Integer age);
+public interface PersonRepository extends JpaRepository<Person, Long> {
+    Optional<Person> findFirstByNameAndAge(String name, Integer age);
+
+    List<Person> findAll();
+
+    Page<Person> findAll(Pageable pageable);
 }

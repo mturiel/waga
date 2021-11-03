@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-class PersonDTO {
+public class PersonDTO {
     private String name;
     private Integer age;
 }
