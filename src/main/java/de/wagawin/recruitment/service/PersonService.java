@@ -48,11 +48,7 @@ public class PersonService {
             attached = personRepository.findById(person.getId());
         }
 
-        if (attached.isPresent()) {
-            return attached.get();
-        }
-
-        throw new NotFoundException();
+        return attached.orElseThrow(NotFoundException::new);
     }
 
     /**
@@ -70,23 +66,16 @@ public class PersonService {
             attached = childRepository.findById(child.getId());
         }
 
-        if (attached.isPresent()) {
-            // Sort meals by vote. Higher the vote, more favorite is the meal.
-            Optional<Meal> favoriteMeal = attached.get().getMealList()
-                    .stream()
-                    .sorted(Comparator.comparingInt(Meal::getVote).reversed())
-                    .findFirst();
+        Child kid = attached.orElseThrow(NotFoundException::new);
 
-            ParentMealDTO parentMealDTO;
-            if (favoriteMeal.isPresent()) {
-                parentMealDTO = new ParentMealDTO(attached.get().getPerson(), favoriteMeal.get());
-            } else {
-                parentMealDTO = new ParentMealDTO(attached.get().getPerson(), new Meal());
-            }
-            return parentMealDTO;
-        }
+        // Get the maximum vote. Higher the vote, more favorite is the meal.
+        Optional<Meal> favoriteMeal = kid.getMealList()
+                .stream()
+                .max(Comparator.comparingInt(Meal::getVote));
 
-        throw new NotFoundException();
+        return favoriteMeal
+                .map(meal -> new ParentMealDTO(kid.getPerson(), meal))
+                .orElseGet(() -> new ParentMealDTO(kid.getPerson(), new Meal()));
     }
 
     /**
@@ -105,22 +94,21 @@ public class PersonService {
             attached = childRepository.findById(child.getId());
         }
 
-        if (attached.isPresent()) {
+        Map<String, String> colorMap = attached.map(kid -> {
             String key, value;
-            if (attached.get() instanceof Son) {
+            if (kid instanceof Son) {
                 key = "bicycleColor";
-                value = ((Son) attached.get()).getBicycleColor();
-            } else if (attached.get() instanceof Daughter) {
+                value = ((Son) kid).getBicycleColor();
+            } else if (kid instanceof Daughter) {
                 key = "hairColor";
-                value = ((Daughter) attached.get()).getHairColor();
+                value = ((Daughter) kid).getHairColor();
             } else {
                 throw new InternalException("Child is not of type son or daughter");
             }
+            return Collections.singletonMap(key, value);
+        }).orElseThrow(NotFoundException::new);
 
-            return ResponseEntity.ok(Collections.singletonMap(key, value));
-        }
-
-        throw new NotFoundException();
+        return ResponseEntity.ok(colorMap);
     }
 
     synchronized public ParentSummary getSummary() {
@@ -141,14 +129,13 @@ public class PersonService {
     public void calculatePersonsChildren() {
         final long startTime = System.currentTimeMillis();
 
-        Long amountOfPerson = 0l;
-        Long amountOfChildren = 0l;
+        long amountOfPerson = 0L;
+        long amountOfChildren = 0L;
         int page = 0;
         final int size = 1000;
-        boolean hasContent = true;
 
         Slice<Person> personSliced = personRepository.findAll(PageRequest.of(page, size));
-        hasContent = personSliced.hasContent();
+        boolean hasContent = personSliced.hasContent();
 
         while (hasContent) {
             List<Person> people = personSliced.getContent();
@@ -192,16 +179,15 @@ public class PersonService {
     }
 
     public Child createChild(Child child, Long personId) {
-        Optional<Person> person = personRepository.findById(personId);
-        if (person.isPresent()) {
-            child.setPerson(person.get());
+        Optional<Person> attached = personRepository.findById(personId);
+
+        return attached.map(person -> {
+            child.setPerson(person);
             for (Meal meal : child.getMealList()) {
                 child.addMeal(meal);
             }
             return childRepository.save(child);
-        } else {
-            throw new NotFoundException();
-        }
+        }).orElseThrow(NotFoundException::new);
     }
 
     public void deletePerson(Long id) {

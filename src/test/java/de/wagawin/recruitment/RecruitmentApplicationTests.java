@@ -64,7 +64,10 @@ class RecruitmentApplicationTests {
 
 	@AfterAll
 	void afterAll() {
-		personController.deleteAll();
+		// delete people created by testing
+		for (Person person : this.personList) {
+			personController.deletePerson(person.getId());
+		}
 	}
 
 	@Test
@@ -114,17 +117,18 @@ class RecruitmentApplicationTests {
 	}
 
 	private void populateDatabase() {
+		List<Person> personList = new ArrayList<>();
 		for (int i = 0; i < NUMBER_OF_PEOPLE; i++) {
 			personList.add(createPerson());
 		}
-		personList.forEach(person -> personController.createPerson(person));
+		personList.forEach(person -> this.personList.add(personController.createPerson(person)));
 	}
 
 	private Person createPerson() {
 		Lorem lorem = LoremIpsum.getInstance();
 		Person person = new Person();
 
-		person.setName(lorem.getFirstName());
+		person.setName(lorem.getName());
 		person.setAge(getRandomAgeParent());
 		person.setHouse(createHouse());
 
